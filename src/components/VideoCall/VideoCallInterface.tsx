@@ -97,7 +97,14 @@ export const VideoCallInterface: React.FC = () => {
   const toggleScreenShare = () => setIsScreenSharing(!isScreenSharing);
   const toggleRecording = () => setIsRecording(!isRecording);
   const endCall = () => {
-    console.log('Ending call...');
+    // Stop camera stream
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Redirect to home or show end call screen
+    window.location.href = '/';
   };
 
   return (
