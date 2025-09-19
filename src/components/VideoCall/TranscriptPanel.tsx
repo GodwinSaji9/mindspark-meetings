@@ -21,39 +21,7 @@ interface TranscriptPanelProps {
 }
 
 export const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ isEnabled }) => {
-  const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([
-    {
-      id: '1',
-      speaker: 'Alice Johnson',
-      text: 'Good morning everyone! Thanks for joining our quarterly planning meeting. Today we need to discuss our Q4 objectives and review the current project status.',
-      timestamp: '09:00:15',
-      confidence: 0.95,
-      actionItems: ['Review Q4 objectives']
-    },
-    {
-      id: '2', 
-      speaker: 'You',
-      text: 'Morning Alice! I have the latest metrics ready to share. Our user engagement is up 23% this quarter.',
-      timestamp: '09:00:42',
-      confidence: 0.92
-    },
-    {
-      id: '3',
-      speaker: 'Bob Smith',
-      text: 'That\'s excellent news! We should definitely capitalize on this momentum. I think we need to plan the marketing campaign for next quarter.',
-      timestamp: '09:01:08', 
-      confidence: 0.89,
-      actionItems: ['Plan marketing campaign']
-    },
-    {
-      id: '4',
-      speaker: 'Alice Johnson',
-      text: 'Agreed. Let me assign action items - Bob, can you take the lead on the marketing strategy? We need a proposal by Friday.',
-      timestamp: '09:01:35',
-      confidence: 0.94,
-      actionItems: ['Bob: Marketing strategy proposal due Friday']
-    }
-  ]);
+  const [transcriptItems, setTranscriptItems] = useState<TranscriptItem[]>([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -67,33 +35,7 @@ export const TranscriptPanel: React.FC<TranscriptPanelProps> = ({ isEnabled }) =
     }
   }, [transcriptItems]);
 
-  // Simulate live transcription
-  useEffect(() => {
-    if (!isEnabled) return;
-
-    const interval = setInterval(() => {
-      const speakers = ['Alice Johnson', 'You', 'Bob Smith'];
-      const sampleTexts = [
-        'I think we should prioritize the user experience improvements.',
-        'The analytics data shows promising trends in user retention.',
-        'We need to coordinate with the design team on the new features.',
-        'Let\'s schedule a follow-up meeting to review progress.',
-        'The development timeline looks achievable with current resources.'
-      ];
-
-      const newItem: TranscriptItem = {
-        id: Date.now().toString(),
-        speaker: speakers[Math.floor(Math.random() * speakers.length)],
-        text: sampleTexts[Math.floor(Math.random() * sampleTexts.length)],
-        timestamp: new Date().toLocaleTimeString(),
-        confidence: 0.85 + Math.random() * 0.15
-      };
-
-      setTranscriptItems(prev => [...prev, newItem]);
-    }, 15000); // Add new transcript every 15 seconds
-
-    return () => clearInterval(interval);
-  }, [isEnabled]);
+  // Real transcription would use speech recognition API when enabled
 
   const filteredItems = transcriptItems.filter(item =>
     item.text.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -23,82 +23,12 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ isEnabled }) => {
   const [nodes, setNodes] = useState<MindMapNode[]>([
     {
       id: 'root',
-      text: 'Q4 Planning Meeting',
+      text: 'Meeting Topics',
       x: 150,
       y: 120,
       level: 0,
-      children: ['objectives', 'metrics', 'marketing'],
+      children: [],
       color: '#8B5CF6'
-    },
-    {
-      id: 'objectives',
-      text: 'Q4 Objectives',
-      x: 50,
-      y: 50,
-      level: 1,
-      children: ['revenue', 'growth'],
-      parent: 'root',
-      color: '#06B6D4'
-    },
-    {
-      id: 'metrics',
-      text: 'Current Metrics',
-      x: 150,
-      y: 50,
-      level: 1,
-      children: ['engagement'],
-      parent: 'root',
-      color: '#10B981'
-    },
-    {
-      id: 'marketing',
-      text: 'Marketing Strategy',
-      x: 250,
-      y: 50,
-      level: 1,
-      children: ['campaign'],
-      parent: 'root',
-      color: '#F59E0B'
-    },
-    {
-      id: 'revenue',
-      text: 'Revenue Targets',
-      x: 20,
-      y: 20,
-      level: 2,
-      children: [],
-      parent: 'objectives',
-      color: '#06B6D4'
-    },
-    {
-      id: 'growth',
-      text: 'User Growth',
-      x: 80,
-      y: 20,
-      level: 2,
-      children: [],
-      parent: 'objectives',
-      color: '#06B6D4'
-    },
-    {
-      id: 'engagement',
-      text: 'Engagement +23%',
-      x: 150,
-      y: 20,
-      level: 2,
-      children: [],
-      parent: 'metrics',
-      color: '#10B981'
-    },
-    {
-      id: 'campaign',
-      text: 'Campaign Planning',
-      x: 250,
-      y: 20,
-      level: 2,
-      children: [],
-      parent: 'marketing',
-      color: '#F59E0B'
     }
   ]);
 
@@ -108,53 +38,7 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ isEnabled }) => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
 
-  // Simulate real-time updates
-  useEffect(() => {
-    if (!isEnabled) return;
-
-    const interval = setInterval(() => {
-      const topics = [
-        'Action Items',
-        'Timeline Review',
-        'Resource Planning',
-        'Risk Assessment',
-        'Budget Allocation',
-        'Team Coordination'
-      ];
-      
-      const colors = ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
-      
-      const newTopic = topics[Math.floor(Math.random() * topics.length)];
-      const newId = `node-${Date.now()}`;
-      
-      setNodes(prev => {
-        // Check if topic already exists
-        if (prev.some(node => node.text === newTopic)) return prev;
-        
-        const newNode: MindMapNode = {
-          id: newId,
-          text: newTopic,
-          x: Math.random() * 200 + 50,
-          y: Math.random() * 100 + 150,
-          level: 1,
-          children: [],
-          parent: 'root',
-          color: colors[Math.floor(Math.random() * colors.length)]
-        };
-        
-        // Update root node children
-        const updated = prev.map(node =>
-          node.id === 'root'
-            ? { ...node, children: [...node.children, newId] }
-            : node
-        );
-        
-        return [...updated, newNode];
-      });
-    }, 20000); // Add new node every 20 seconds
-
-    return () => clearInterval(interval);
-  }, [isEnabled]);
+  // AI mind mapping would generate nodes based on conversation when enabled
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);

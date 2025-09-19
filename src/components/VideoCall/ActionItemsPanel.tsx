@@ -40,102 +40,14 @@ interface Decision {
 }
 
 export const ActionItemsPanel: React.FC = () => {
-  const [actionItems, setActionItems] = useState<ActionItem[]>([
-    {
-      id: '1',
-      title: 'Create Q4 Marketing Strategy',
-      description: 'Develop comprehensive marketing strategy for Q4 focusing on user engagement growth',
-      assignee: 'Bob Smith',
-      dueDate: '2024-01-26',
-      priority: 'high',
-      status: 'pending',
-      context: 'Bob, can you take the lead on the marketing strategy? We need a proposal by Friday.',
-      timestamp: '09:01:35',
-      confidence: 0.94
-    },
-    {
-      id: '2',
-      title: 'Review Current Metrics Report',
-      description: 'Analyze user engagement metrics and prepare detailed report',
-      assignee: 'You',
-      dueDate: '2024-01-24',
-      priority: 'medium',
-      status: 'in-progress',
-      context: 'Our user engagement is up 23% this quarter.',
-      timestamp: '09:00:42',
-      confidence: 0.92
-    },
-    {
-      id: '3',
-      title: 'Schedule Design Team Coordination',
-      description: 'Coordinate with design team on new feature implementation',
-      assignee: 'Alice Johnson',
-      dueDate: '2024-01-25',
-      priority: 'medium',
-      status: 'pending',
-      context: 'We need to coordinate with the design team on the new features.',
-      timestamp: '09:02:15',
-      confidence: 0.89
-    }
-  ]);
+  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
 
-  const [decisions, setDecisions] = useState<Decision[]>([
-    {
-      id: '1',
-      title: 'Prioritize User Experience Improvements',
-      description: 'Team decided to focus on UX improvements as primary Q4 objective',
-      decisionMaker: 'Alice Johnson',
-      timestamp: '09:01:20',
-      impact: 'high',
-      context: 'I think we should prioritize the user experience improvements.'
-    },
-    {
-      id: '2',
-      title: 'Increase Marketing Budget',
-      description: 'Approved budget increase for Q4 marketing campaign',
-      decisionMaker: 'Team Consensus',
-      timestamp: '09:02:45',
-      impact: 'medium',
-      context: 'We should definitely capitalize on this momentum.'
-    }
-  ]);
+  const [decisions, setDecisions] = useState<Decision[]>([]);
 
   const [filter, setFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
 
-  // Simulate AI extracting new action items
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newActions = [
-        'Follow up with stakeholders',
-        'Update project timeline',
-        'Prepare presentation slides',
-        'Schedule team retrospective',
-        'Review budget allocation',
-        'Coordinate with external vendors'
-      ];
-
-      const assignees = ['You', 'Alice Johnson', 'Bob Smith', 'Sarah Wilson'];
-      const priorities: ('high' | 'medium' | 'low')[] = ['high', 'medium', 'low'];
-
-      const newAction: ActionItem = {
-        id: Date.now().toString(),
-        title: newActions[Math.floor(Math.random() * newActions.length)],
-        description: 'Auto-generated action item based on meeting discussion',
-        assignee: assignees[Math.floor(Math.random() * assignees.length)],
-        dueDate: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        priority: priorities[Math.floor(Math.random() * priorities.length)],
-        status: 'pending',
-        context: 'Extracted from recent conversation',
-        timestamp: new Date().toLocaleTimeString(),
-        confidence: 0.75 + Math.random() * 0.25
-      };
-
-      setActionItems(prev => [...prev, newAction]);
-    }, 30000); // Add new action item every 30 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  // AI would extract action items from transcript when enabled
 
   const filteredItems = actionItems.filter(item => {
     if (filter !== 'all' && item.status !== filter) return false;

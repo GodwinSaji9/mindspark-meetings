@@ -43,6 +43,8 @@ export const VideoCallInterface: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
   const [isMindMapEnabled, setIsMindMapEnabled] = useState(true);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([
     {
       id: '1',
@@ -95,7 +97,48 @@ export const VideoCallInterface: React.FC = () => {
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleVideo = () => setIsVideoOn(!isVideoOn);
   const toggleScreenShare = () => setIsScreenSharing(!isScreenSharing);
-  const toggleRecording = () => setIsRecording(!isRecording);
+  
+  const toggleRecording = async () => {
+    if (!isRecording) {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ 
+          video: true, 
+          audio: true 
+        });
+        
+        const recorder = new MediaRecorder(stream);
+        const chunks: Blob[] = [];
+        
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
+        
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `meeting-recording-${new Date().toISOString()}.webm`;
+          a.click();
+          setRecordedChunks([]);
+        };
+        
+        recorder.start();
+        setMediaRecorder(recorder);
+        setIsRecording(true);
+      } catch (error) {
+        console.error('Error starting recording:', error);
+      }
+    } else {
+      if (mediaRecorder) {
+        mediaRecorder.stop();
+        setMediaRecorder(null);
+        setIsRecording(false);
+      }
+    }
+  };
   const endCall = () => {
     // Stop camera stream
     if (videoRef.current?.srcObject) {
