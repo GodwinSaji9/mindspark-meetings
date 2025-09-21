@@ -14,7 +14,250 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      action_items: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          meeting_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          meeting_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          meeting_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_items_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          host_id: string | null
+          id: string
+          meeting_id: string
+          started_at: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          host_id?: string | null
+          id?: string
+          meeting_id: string
+          started_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          host_id?: string | null
+          id?: string
+          meeting_id?: string
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mind_maps: {
+        Row: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          meeting_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          meeting_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          meeting_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mind_maps_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      participants: {
+        Row: {
+          id: string
+          is_muted: boolean
+          is_speaking: boolean
+          is_video_on: boolean
+          joined_at: string
+          left_at: string | null
+          meeting_id: string | null
+          name: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean
+          is_speaking?: boolean
+          is_video_on?: boolean
+          joined_at?: string
+          left_at?: string | null
+          meeting_id?: string | null
+          name: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean
+          is_speaking?: boolean
+          is_video_on?: boolean
+          joined_at?: string
+          left_at?: string | null
+          meeting_id?: string | null
+          name?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recordings: {
+        Row: {
+          created_at: string
+          duration: number | null
+          ended_at: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          meeting_id: string | null
+          started_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration?: number | null
+          ended_at?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          meeting_id?: string | null
+          started_at: string
+        }
+        Update: {
+          created_at?: string
+          duration?: number | null
+          ended_at?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          meeting_id?: string | null
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recordings_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transcripts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meeting_id: string | null
+          speaker_name: string
+          timestamp: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          speaker_name: string
+          timestamp?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meeting_id?: string | null
+          speaker_name?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transcripts_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

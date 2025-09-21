@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { VideoCallInterface } from '@/components/VideoCall/VideoCallInterface';
 import { MeetingDashboard } from '@/components/Dashboard/MeetingDashboard';
+import { MeetingLobby } from './MeetingLobby';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -127,7 +128,7 @@ const Index = () => {
   }
 
   if (currentView === 'meeting') {
-    return <VideoCallInterface />;
+    return <MeetingLobby />;
   }
 
   return <MeetingDashboard />;

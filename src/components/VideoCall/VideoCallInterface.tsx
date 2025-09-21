@@ -24,53 +24,25 @@ import { MindMapPanel } from './MindMapPanel';
 import { ActionItemsPanel } from './ActionItemsPanel';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { BackgroundControls } from './BackgroundControls';
-
-interface Participant {
-  id: string;
-  name: string;
-  avatar?: string;
-  isMuted: boolean;
-  isVideoOn: boolean;
-  isSpeaking: boolean;
-  status: 'online' | 'away' | 'busy';
-}
+import { useMeeting, Participant } from '@/hooks/useMeeting';
+import { useRecording } from '@/hooks/useRecording';
+import { useTranscript } from '@/hooks/useTranscript';
+import { useSearchParams } from 'react-router-dom';
 
 export const VideoCallInterface: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const meetingId = searchParams.get('id');
+  
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [activePanel, setActivePanel] = useState<'transcript' | 'mindmap' | 'actions' | 'participants' | null>('transcript');
-  const [isRecording, setIsRecording] = useState(false);
   const [isTranscriptionEnabled, setIsTranscriptionEnabled] = useState(true);
   const [isMindMapEnabled, setIsMindMapEnabled] = useState(true);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
-  const [participants, setParticipants] = useState<Participant[]>([
-    {
-      id: '1',
-      name: 'You',
-      isMuted: false,
-      isVideoOn: true,
-      isSpeaking: false,
-      status: 'online'
-    },
-    {
-      id: '2', 
-      name: 'Alice Johnson',
-      isMuted: false,
-      isVideoOn: true,
-      isSpeaking: true,
-      status: 'online'
-    },
-    {
-      id: '3',
-      name: 'Bob Smith', 
-      isMuted: true,
-      isVideoOn: false,
-      isSpeaking: false,
-      status: 'online'
-    }
-  ]);
+
+  const { meeting, participants, isHost, loading, leaveMeeting, updateParticipantStatus } = useMeeting(meetingId || undefined);
+  const { isRecording, startRecording, stopRecording } = useRecording(meetingId || undefined);
+  const { transcript, isListening, startListening, stopListening } = useTranscript(meetingId || undefined);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [backgroundBlur, setBackgroundBlur] = useState(false);
@@ -94,52 +66,39 @@ export const VideoCallInterface: React.FC = () => {
     initCamera();
   }, []);
 
-  const toggleMute = () => setIsMuted(!isMuted);
-  const toggleVideo = () => setIsVideoOn(!isVideoOn);
+  const toggleMute = async () => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    await updateParticipantStatus({ is_muted: newMuted });
+  };
+
+  const toggleVideo = async () => {
+    const newVideoOn = !isVideoOn;
+    setIsVideoOn(newVideoOn);
+    await updateParticipantStatus({ is_video_on: newVideoOn });
+  };
+
   const toggleScreenShare = () => setIsScreenSharing(!isScreenSharing);
-  
-  const toggleRecording = async () => {
-    if (!isRecording) {
-      try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ 
-          video: true, 
-          audio: true 
-        });
-        
-        const recorder = new MediaRecorder(stream);
-        const chunks: Blob[] = [];
-        
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) {
-            chunks.push(e.data);
-          }
-        };
-        
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'video/webm' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `meeting-recording-${new Date().toISOString()}.webm`;
-          a.click();
-          setRecordedChunks([]);
-        };
-        
-        recorder.start();
-        setMediaRecorder(recorder);
-        setIsRecording(true);
-      } catch (error) {
-        console.error('Error starting recording:', error);
-      }
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
     } else {
-      if (mediaRecorder) {
-        mediaRecorder.stop();
-        setMediaRecorder(null);
-        setIsRecording(false);
-      }
+      startRecording();
     }
   };
-  const endCall = () => {
+
+  const toggleTranscription = () => {
+    const newEnabled = !isTranscriptionEnabled;
+    setIsTranscriptionEnabled(newEnabled);
+    
+    if (newEnabled && !isListening) {
+      startListening();
+    } else if (!newEnabled && isListening) {
+      stopListening();
+    }
+  };
+  const endCall = async () => {
     // Stop camera stream
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -147,10 +106,17 @@ export const VideoCallInterface: React.FC = () => {
     }
     
     // Stop recording if active
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
+    if (isRecording) {
+      stopRecording();
     }
+
+    // Stop transcription if active
+    if (isListening) {
+      stopListening();
+    }
+    
+    // Leave meeting
+    await leaveMeeting();
     
     // Navigate back to home
     window.location.replace('/');
@@ -161,7 +127,14 @@ export const VideoCallInterface: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-card border-b border-border">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold text-foreground">EchoMind Meeting</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {meeting?.title || 'EchoMind Meeting'}
+          </h1>
+          {meetingId && (
+            <Badge variant="outline" className="font-mono">
+              ID: {meetingId}
+            </Badge>
+          )}
           <Badge variant={isRecording ? "destructive" : "secondary"} className="animate-pulse-glow">
             {isRecording ? 'REC' : 'READY'}
           </Badge>
@@ -171,11 +144,11 @@ export const VideoCallInterface: React.FC = () => {
           <Button
             variant={isTranscriptionEnabled ? "default" : "secondary"}
             size="sm"
-            onClick={() => setIsTranscriptionEnabled(!isTranscriptionEnabled)}
+            onClick={toggleTranscription}
             className="glow-primary"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            Transcript
+            {isListening ? 'Stop Transcript' : 'Start Transcript'}
           </Button>
           
           <Button
@@ -230,10 +203,10 @@ export const VideoCallInterface: React.FC = () => {
             </Card>
 
             {/* Participant Videos */}
-            {participants.slice(1).map((participant) => (
+            {participants.filter(p => p.name !== 'You').map((participant) => (
               <Card key={participant.id} className="relative overflow-hidden bg-gradient-card">
                 <div className="w-full h-full bg-muted flex items-center justify-center">
-                  {participant.isVideoOn ? (
+                  {participant.is_video_on ? (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                       <Camera className="w-12 h-12 text-muted-foreground" />
                     </div>
@@ -253,8 +226,8 @@ export const VideoCallInterface: React.FC = () => {
                   <Badge variant="secondary" className="bg-black/50 text-white text-xs">
                     {participant.name}
                   </Badge>
-                  {participant.isMuted && <MicOff className="w-3 h-3 text-destructive" />}
-                  {participant.isSpeaking && (
+                  {participant.is_muted && <MicOff className="w-3 h-3 text-destructive" />}
+                  {participant.is_speaking && (
                     <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
                   )}
                 </div>
@@ -306,9 +279,9 @@ export const VideoCallInterface: React.FC = () => {
             </div>
             
             <div className="flex-1 overflow-hidden">
-              {activePanel === 'transcript' && <TranscriptPanel isEnabled={isTranscriptionEnabled} />}
-              {activePanel === 'mindmap' && <MindMapPanel isEnabled={isMindMapEnabled} />}
-              {activePanel === 'actions' && <ActionItemsPanel />}
+              {activePanel === 'transcript' && <TranscriptPanel transcript={transcript} meetingId={meetingId} />}
+              {activePanel === 'mindmap' && <MindMapPanel meetingId={meetingId} />}
+              {activePanel === 'actions' && <ActionItemsPanel meetingId={meetingId} />}
               {activePanel === 'participants' && <ParticipantsPanel participants={participants} />}
             </div>
           </div>
