@@ -146,8 +146,14 @@ export const VideoCallInterface: React.FC = () => {
       stream.getTracks().forEach(track => track.stop());
     }
     
-    // Redirect to home or show end call screen
-    window.location.href = '/';
+    // Stop recording if active
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+    
+    // Navigate back to home
+    window.location.replace('/');
   };
 
   return (

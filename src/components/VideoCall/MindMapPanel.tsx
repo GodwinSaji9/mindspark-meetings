@@ -20,17 +20,7 @@ interface MindMapPanelProps {
 }
 
 export const MindMapPanel: React.FC<MindMapPanelProps> = ({ isEnabled }) => {
-  const [nodes, setNodes] = useState<MindMapNode[]>([
-    {
-      id: 'root',
-      text: 'Meeting Topics',
-      x: 150,
-      y: 120,
-      level: 0,
-      children: [],
-      color: '#8B5CF6'
-    }
-  ]);
+  const [nodes, setNodes] = useState<MindMapNode[]>([]);
 
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
