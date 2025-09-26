@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useMeeting } from '@/hooks/useMeeting';
 import { useNavigate } from 'react-router-dom';
 import { Video, Users, Calendar } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export const MeetingLobby: React.FC = () => {
   const [meetingTitle, setMeetingTitle] = useState('');
@@ -12,6 +13,13 @@ export const MeetingLobby: React.FC = () => {
   const [userName, setUserName] = useState('');
   const { createMeeting, joinMeeting } = useMeeting();
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
 
   const handleCreateMeeting = async () => {
     if (!meetingTitle.trim()) return;
@@ -28,6 +36,21 @@ export const MeetingLobby: React.FC = () => {
       navigate(`/video-call?id=${joinMeetingId}`);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Video className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -5,6 +5,8 @@ import { MeetingLobby } from './MeetingLobby';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { 
   Video, 
   Brain, 
@@ -20,6 +22,24 @@ import {
 const Index = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'meeting'>('dashboard');
   const [showWelcome, setShowWelcome] = useState(true);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Video className="w-12 h-12 mx-auto mb-4 text-primary animate-pulse" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
 
   if (showWelcome) {
     return (
@@ -74,15 +94,12 @@ const Index = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={() => {
-                setCurrentView('meeting');
-                setShowWelcome(false);
-              }}
+              onClick={() => navigate('/meeting-lobby')}
               className="glow-primary animate-pulse-glow"
               size="lg"
             >
               <Play className="w-5 h-5 mr-2" />
-              Start Demo Meeting
+              Start Meeting
             </Button>
             
             <Button 
