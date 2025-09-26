@@ -58,8 +58,22 @@ export const useMeeting = (meetingId?: string) => {
 
       if (error) throw error;
 
-      // Join as host
-      await joinMeeting(data.id, user.email || 'Host');
+      // Add the host as a participant
+      const { error: participantError } = await supabase
+        .from('participants')
+        .insert({
+          meeting_id: data.id,
+          user_id: user.id,
+          name: user.email?.split('@')[0] || 'Host',
+          status: 'online'
+        });
+
+      if (participantError) throw participantError;
+
+      toast({
+        title: "Meeting Created!",
+        description: `Meeting ID: ${newMeetingId} - Share this with others to join`,
+      });
       
       return data.meeting_id;
     } catch (error) {
