@@ -52,8 +52,10 @@ export const useTranscript = (meetingId?: string) => {
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
+      console.log('Speech recognition started');
       setIsListening(true);
     };
 
@@ -66,21 +68,39 @@ export const useTranscript = (meetingId?: string) => {
         }
       }
       
-      if (finalTranscript) {
+      if (finalTranscript.trim()) {
+        console.log('Final transcript:', finalTranscript);
         addTranscriptEntry('You', finalTranscript);
       }
     };
 
     recognition.onerror = (event) => {
       console.error('Speech recognition error:', event.error);
-      setIsListening(false);
+      if (event.error !== 'no-speech') {
+        setIsListening(false);
+      }
     };
 
     recognition.onend = () => {
+      console.log('Speech recognition ended');
       setIsListening(false);
+      
+      // Auto-restart if still supposed to be listening
+      if (isListening) {
+        setTimeout(() => {
+          if (isListening) {
+            recognition.start();
+          }
+        }, 100);
+      }
     };
 
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      setIsListening(false);
+    }
     
     return () => {
       recognition.stop();

@@ -21,7 +21,11 @@ export const useRecording = (meetingId?: string) => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({ 
         video: true, 
-        audio: true 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        }
       });
       
       const recorder = new MediaRecorder(stream);

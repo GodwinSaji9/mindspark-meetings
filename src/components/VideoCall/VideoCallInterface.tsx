@@ -45,7 +45,10 @@ export const VideoCallInterface: React.FC = () => {
   const { transcript, isListening, startListening, stopListening } = useTranscript(meetingId || undefined);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const screenShareRef = useRef<HTMLVideoElement>(null);
   const [backgroundBlur, setBackgroundBlur] = useState(false);
+  const [userStream, setUserStream] = useState<MediaStream | null>(null);
+  const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
     // Initialize camera
@@ -55,6 +58,7 @@ export const VideoCallInterface: React.FC = () => {
           video: true, 
           audio: true 
         });
+        setUserStream(stream);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -64,6 +68,15 @@ export const VideoCallInterface: React.FC = () => {
     };
     
     initCamera();
+    
+    return () => {
+      if (userStream) {
+        userStream.getTracks().forEach(track => track.stop());
+      }
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   const toggleMute = async () => {
@@ -75,10 +88,55 @@ export const VideoCallInterface: React.FC = () => {
   const toggleVideo = async () => {
     const newVideoOn = !isVideoOn;
     setIsVideoOn(newVideoOn);
+    
+    if (userStream && videoRef.current) {
+      const videoTrack = userStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = newVideoOn;
+      }
+    }
+    
     await updateParticipantStatus({ is_video_on: newVideoOn });
   };
 
-  const toggleScreenShare = () => setIsScreenSharing(!isScreenSharing);
+  const toggleScreenShare = async () => {
+    if (isScreenSharing) {
+      // Stop screen sharing
+      if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
+        setScreenStream(null);
+      }
+      // Switch back to camera
+      if (userStream && videoRef.current) {
+        videoRef.current.srcObject = userStream;
+      }
+      setIsScreenSharing(false);
+    } else {
+      try {
+        // Start screen sharing
+        const displayStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true
+        });
+        setScreenStream(displayStream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = displayStream;
+        }
+        setIsScreenSharing(true);
+        
+        // Stop screen sharing when user clicks stop in browser
+        displayStream.getVideoTracks()[0].onended = () => {
+          setIsScreenSharing(false);
+          setScreenStream(null);
+          if (userStream && videoRef.current) {
+            videoRef.current.srcObject = userStream;
+          }
+        };
+      } catch (error) {
+        console.error('Error starting screen share:', error);
+      }
+    }
+  };
 
   const toggleRecording = () => {
     if (isRecording) {
@@ -161,7 +219,29 @@ export const VideoCallInterface: React.FC = () => {
             Mind Map
           </Button>
           
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              // Export transcript and action items
+              const exportData = {
+                meeting: meeting?.title || 'EchoMind Meeting',
+                meetingId: meetingId,
+                date: new Date().toLocaleDateString(),
+                transcript: transcript,
+                participants: participants.map(p => p.name)
+              };
+              
+              const dataStr = JSON.stringify(exportData, null, 2);
+              const dataBlob = new Blob([dataStr], { type: 'application/json' });
+              const url = URL.createObjectURL(dataBlob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `meeting-export-${meetingId}-${new Date().toISOString().split('T')[0]}.json`;
+              link.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -179,9 +259,26 @@ export const VideoCallInterface: React.FC = () => {
                 ref={videoRef}
                 autoPlay
                 muted
-                className={`w-full h-full object-cover ${backgroundBlur ? 'blur-sm' : ''}`}
-                style={{ transform: 'scaleX(-1)' }}
+                className="w-full h-full object-cover"
+                style={{ 
+                  transform: 'scaleX(-1)',
+                  filter: backgroundBlur && !isScreenSharing ? 'blur(8px)' : 'none'
+                }}
               />
+              
+              {/* User overlay when video is off */}
+              {!isVideoOn && (
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-semibold text-primary-foreground">
+                        You
+                      </span>
+                    </div>
+                    <p className="text-white">Camera Off</p>
+                  </div>
+                </div>
+              )}
               
               {/* Video Overlay */}
               <div className="absolute bottom-4 left-4 flex items-center space-x-2">

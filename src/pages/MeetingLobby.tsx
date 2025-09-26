@@ -25,7 +25,13 @@ export const MeetingLobby: React.FC = () => {
     if (!meetingTitle.trim()) return;
     const newMeetingId = await createMeeting(meetingTitle);
     if (newMeetingId) {
-      navigate(`/video-call?id=${newMeetingId}`);
+      // Auto-join the host with their own name
+      const userEmail = user?.email || 'Host';
+      const hostName = userEmail.split('@')[0] || 'Host';
+      const success = await joinMeeting(newMeetingId, hostName);
+      if (success) {
+        navigate(`/video-call?id=${newMeetingId}`);
+      }
     }
   };
 
