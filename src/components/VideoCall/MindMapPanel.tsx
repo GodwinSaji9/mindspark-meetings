@@ -81,7 +81,7 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ meetingId }) => {
                     value={newTopic}
                     onChange={(e) => setNewTopic(e.target.value)}
                     placeholder="Enter main topic..." 
-                    className="w-full px-3 py-2 border rounded-md text-sm"
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     onKeyPress={(e) => e.key === 'Enter' && handleCreateMindMap()}
                   />
                   <div className="flex space-x-2">
@@ -111,15 +111,44 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ meetingId }) => {
         ) : (
           <div className="space-y-4">
             {/* Mind map visualization */}
-            <div className="bg-card border rounded-lg p-4 min-h-[300px] relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-card border rounded-lg p-6 min-h-[400px] relative overflow-hidden">
+              {/* SVG for connection lines */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+                {currentMindMap.content.nodes
+                  .filter(node => node.type !== 'central')
+                  .map((node, index) => {
+                    const angle = (index * (360 / Math.max(currentMindMap.content.nodes.filter(n => n.type !== 'central').length, 1))) - 90;
+                    const radius = 160;
+                    const x1 = 50; // Center percentage
+                    const y1 = 50;
+                    const x2 = 50 + (Math.cos(angle * Math.PI / 180) * radius * 100 / 400); // Adjust for container size
+                    const y2 = 50 + (Math.sin(angle * Math.PI / 180) * radius * 100 / 400);
+                    
+                    return (
+                      <line
+                        key={`line-${node.id}`}
+                        x1={`${x1}%`}
+                        y1={`${y1}%`}
+                        x2={`${x2}%`}
+                        y2={`${y2}%`}
+                        stroke="hsl(var(--primary))"
+                        strokeWidth="2"
+                        opacity="0.6"
+                        strokeDasharray="5,5"
+                      />
+                    );
+                  })
+                }
+              </svg>
+
+              <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
                 {/* Central node */}
                 {currentMindMap.content.nodes
                   .filter(node => node.type === 'central')
                   .map(node => (
                     <div
                       key={node.id}
-                      className="bg-primary text-primary-foreground rounded-full px-6 py-3 font-medium text-center min-w-[120px] shadow-lg"
+                      className="bg-gradient-to-br from-primary to-primary-hover text-primary-foreground rounded-xl px-8 py-4 font-semibold text-center min-w-[140px] shadow-xl border-2 border-primary-glow/20 glow-primary"
                     >
                       {node.text}
                     </div>
@@ -128,12 +157,13 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ meetingId }) => {
               </div>
               
               {/* Branch nodes */}
-              <div className="absolute inset-0">
+              <div className="absolute inset-0" style={{ zIndex: 2 }}>
                 {currentMindMap.content.nodes
                   .filter(node => node.type !== 'central')
                   .map((node, index) => {
-                    const angle = (index * 60) - 90; // Distribute around circle
-                    const radius = 150;
+                    const totalBranches = currentMindMap.content.nodes.filter(n => n.type !== 'central').length;
+                    const angle = (index * (360 / Math.max(totalBranches, 1))) - 90;
+                    const radius = 160;
                     const x = Math.cos(angle * Math.PI / 180) * radius;
                     const y = Math.sin(angle * Math.PI / 180) * radius;
                     
@@ -146,20 +176,9 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ meetingId }) => {
                           top: `calc(50% + ${y}px)`,
                         }}
                       >
-                        <div className="bg-accent text-accent-foreground rounded-lg px-4 py-2 text-sm shadow-md border-2 border-accent/30">
+                        <div className="bg-gradient-to-br from-accent to-accent/80 text-accent-foreground rounded-lg px-4 py-3 text-sm font-medium shadow-lg border-2 border-accent/40 hover:scale-105 transition-transform">
                           {node.text}
                         </div>
-                        {/* Connection line */}
-                        <div
-                          className="absolute border-t border-muted-foreground/30"
-                          style={{
-                            width: `${radius}px`,
-                            left: `calc(50% - ${x}px)`,
-                            top: '50%',
-                            transform: `rotate(${angle + 180}deg)`,
-                            transformOrigin: 'right center'
-                          }}
-                        />
                       </div>
                     );
                   })
@@ -176,7 +195,7 @@ export const MindMapPanel: React.FC<MindMapPanelProps> = ({ meetingId }) => {
                   value={newBranch}
                   onChange={(e) => setNewBranch(e.target.value)}
                   placeholder="Enter new idea..." 
-                  className="flex-1 px-3 py-2 border rounded-md text-sm"
+                  className="flex-1 px-3 py-2 border border-input bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddBranch()}
                 />
                 <Button 

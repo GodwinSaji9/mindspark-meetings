@@ -55,14 +55,14 @@ export const ActionItemsPanel: React.FC<ActionItemsPanelProps> = ({ meetingId })
             value={newActionItem}
             onChange={(e) => setNewActionItem(e.target.value)}
             placeholder="Enter action item title..."
-            className="w-full px-3 py-2 border rounded-md text-sm"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             onKeyPress={(e) => e.key === 'Enter' && handleAddActionItem()}
           />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Optional description..."
-            className="w-full px-3 py-2 border rounded-md text-sm h-16 resize-none"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md text-sm h-16 resize-none focus:outline-none focus:ring-2 focus:ring-ring"
           />
           <Button 
             size="sm" 
