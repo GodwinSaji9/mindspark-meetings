@@ -28,9 +28,7 @@ export const Auth: React.FC = () => {
         
         // Redirect authenticated users to home
         if (session?.user) {
-          setTimeout(() => {
-            navigate('/');
-          }, 0);
+          navigate('/', { replace: true });
         }
       }
     );
@@ -41,7 +39,7 @@ export const Auth: React.FC = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        navigate('/');
+        navigate('/', { replace: true });
       }
     });
 
