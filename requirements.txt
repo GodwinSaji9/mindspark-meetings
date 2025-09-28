@@ -72,9 +72,3 @@ vaul@^0.9.9
 
 # Charts and Visualization
 recharts@^2.15.4
-
-# Installation Instructions:
-# 1. Clone the repository
-# 2. Run: npm install (or yarn install)
-# 3. Set up environment variables
-# 4. Run: npm run dev (or yarn dev)
