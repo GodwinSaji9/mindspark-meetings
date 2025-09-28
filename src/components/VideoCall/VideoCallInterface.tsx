@@ -186,7 +186,7 @@ export const VideoCallInterface: React.FC = () => {
       <div className="flex items-center justify-between p-4 bg-card border-b border-border">
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold text-foreground">
-            {meeting?.title || 'EchoMind Meeting'}
+            {meeting?.title || 'REVIA Meeting'}
           </h1>
           {meetingId && (
             <Badge variant="outline" className="font-mono">
@@ -225,7 +225,7 @@ export const VideoCallInterface: React.FC = () => {
             onClick={() => {
               // Export transcript and action items
               const exportData = {
-                meeting: meeting?.title || 'EchoMind Meeting',
+                meeting: meeting?.title || 'REVIA Meeting',
                 meetingId: meetingId,
                 date: new Date().toLocaleDateString(),
                 transcript: transcript,

@@ -139,7 +139,7 @@ export const MeetingDashboard: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">EchoMind Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">REVIA Dashboard</h1>
             <p className="text-muted-foreground">Your AI-powered meeting companion</p>
           </div>
           

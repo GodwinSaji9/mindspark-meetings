@@ -241,7 +241,7 @@ export const Auth: React.FC = () => {
       <div className="max-w-md w-full space-y-6">
         <div className="text-center">
           <Video className="w-12 h-12 mx-auto mb-4 text-primary" />
-          <h1 className="text-2xl font-bold">EchoMind Meetings</h1>
+          <h1 className="text-2xl font-bold">REVIA Meetings</h1>
           <p className="text-muted-foreground">
             {isResetPassword ? 'Set your new password' : (isForgotPassword ? 'Reset your password' : (isSignUp ? 'Create your account' : 'Sign in to your account'))}
           </p>

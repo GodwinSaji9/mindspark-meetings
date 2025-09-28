@@ -59,7 +59,7 @@ const Index = () => {
               <Brain className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold gradient-text mb-4">
-              Welcome to EchoMind
+              Welcome to REVIA
             </h1>
             <p className="text-xl text-muted-foreground mb-2">
               Your AI-Powered Meeting Assistant

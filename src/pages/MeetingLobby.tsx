@@ -63,7 +63,7 @@ export const MeetingLobby: React.FC = () => {
       <div className="max-w-md w-full space-y-6">
         <div className="text-center">
           <Video className="w-12 h-12 mx-auto mb-4 text-primary" />
-          <h1 className="text-2xl font-bold">EchoMind Meetings</h1>
+          <h1 className="text-2xl font-bold">REVIA Meetings</h1>
           <p className="text-muted-foreground">Start or join a meeting</p>
         </div>
 
