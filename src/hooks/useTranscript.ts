@@ -11,6 +11,7 @@ interface TranscriptEntry {
 export const useTranscript = (meetingId?: string) => {
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [isListening, setIsListening] = useState(false);
+  const [summary, setSummary] = useState<string>('');
 
   const addTranscriptEntry = async (speakerName: string, content: string) => {
     if (!meetingId || !content.trim()) return;
@@ -111,6 +112,25 @@ export const useTranscript = (meetingId?: string) => {
     setIsListening(false);
   };
 
+  const generateSummary = async () => {
+    if (!meetingId || transcript.length === 0) return;
+
+    try {
+      const transcriptText = transcript
+        .map(entry => `${entry.speaker_name}: ${entry.content}`)
+        .join('\n');
+
+      const { data, error } = await supabase.functions.invoke('generate-meeting-summary', {
+        body: { transcriptText, meetingId }
+      });
+
+      if (error) throw error;
+      setSummary(data.summary);
+    } catch (error) {
+      console.error('Error generating summary:', error);
+    }
+  };
+
   useEffect(() => {
     if (!meetingId) return;
 
@@ -161,6 +181,8 @@ export const useTranscript = (meetingId?: string) => {
     isListening,
     startListening,
     stopListening,
-    addTranscriptEntry
+    addTranscriptEntry,
+    summary,
+    generateSummary
   };
 };

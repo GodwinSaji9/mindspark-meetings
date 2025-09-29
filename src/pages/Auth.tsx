@@ -60,13 +60,11 @@ export const Auth: React.FC = () => {
   }, [navigate, isResetPassword]);
 
   const handleSignUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: `${window.location.origin}/`
       }
     });
     return { error };
@@ -222,8 +220,11 @@ export const Auth: React.FC = () => {
       } else if (isSignUp) {
         toast({
           title: "Success",
-          description: "Check your email for the confirmation link",
+          description: "Account created successfully! You can now sign in.",
         });
+        setIsSignUp(false);
+        setEmail('');
+        setPassword('');
       }
     } catch (error) {
       toast({

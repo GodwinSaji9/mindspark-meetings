@@ -54,43 +54,10 @@ export const MeetingDashboard: React.FC = () => {
       date: '2024-01-22',
       duration: '1h 23m',
       participants: 5,
-      status: 'in-progress',
+      status: 'completed',
       aiSummary: true,
       transcription: true,
       actionItems: 8
-    },
-    {
-      id: '2', 
-      title: 'Design Review Session',
-      date: '2024-01-21',
-      duration: '45m',
-      participants: 3,
-      status: 'completed',
-      aiSummary: true,
-      transcription: true,
-      actionItems: 4
-    },
-    {
-      id: '3',
-      title: 'Client Presentation',
-      date: '2024-01-20',
-      duration: '2h 15m',
-      participants: 8,
-      status: 'completed',
-      aiSummary: true,
-      transcription: true,
-      actionItems: 12
-    },
-    {
-      id: '4',
-      title: 'Weekly Standup',
-      date: '2024-01-19',
-      duration: '30m',
-      participants: 6,
-      status: 'completed',
-      aiSummary: false,
-      transcription: true,
-      actionItems: 2
     }
   ]);
 
@@ -144,11 +111,11 @@ export const MeetingDashboard: React.FC = () => {
           </div>
           
           <div className="flex space-x-3">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => window.location.href = '/meeting-lobby'}>
               <Calendar className="w-4 h-4 mr-2" />
               Schedule Meeting
             </Button>
-            <Button className="glow-primary">
+            <Button className="glow-primary" onClick={() => window.location.href = '/meeting-lobby'}>
               <Plus className="w-4 h-4 mr-2" />
               Start Meeting
             </Button>
@@ -333,15 +300,15 @@ export const MeetingDashboard: React.FC = () => {
               <h2 className="text-xl font-semibold text-foreground mb-6">Quick Actions</h2>
               
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/meeting-lobby'}>
                   <Video className="w-4 h-4 mr-2" />
                   Start Instant Meeting
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/meeting-lobby'}>
                   <Calendar className="w-4 h-4 mr-2" />
                   Schedule Meeting
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/meeting-lobby'}>
                   <Users className="w-4 h-4 mr-2" />
                   Join Meeting
                 </Button>
