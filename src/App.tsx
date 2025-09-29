@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import { Auth } from "./pages/Auth";
 import { MeetingLobby } from "./pages/MeetingLobby";
 import { VideoCall } from "./pages/VideoCall";
+import { ScheduleMeeting } from "./pages/ScheduleMeeting";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/meeting-lobby" element={<MeetingLobby />} />
           <Route path="/video-call" element={<VideoCall />} />
+          <Route path="/schedule-meeting" element={<ScheduleMeeting />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

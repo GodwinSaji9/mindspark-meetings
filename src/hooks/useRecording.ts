@@ -41,6 +41,7 @@ export const useRecording = (meetingId?: string) => {
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         await saveRecording(blob, startTime, new Date());
+        downloadRecording(blob, meetingId || 'recording');
       };
       
       recorder.start();
@@ -124,6 +125,17 @@ export const useRecording = (meetingId?: string) => {
         variant: "destructive"
       });
     }
+  };
+
+  const downloadRecording = (blob: Blob, meetingId: string) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `meeting-recording-${meetingId}-${new Date().toISOString().split('T')[0]}.webm`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return {

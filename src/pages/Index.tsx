@@ -16,14 +16,20 @@ import {
   Sparkles,
   Play,
   Calendar,
-  Settings
+  Settings,
+  LogOut
 } from 'lucide-react';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'meeting'>('dashboard');
   const [showWelcome, setShowWelcome] = useState(true);
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   if (loading) {
     return (
@@ -121,6 +127,15 @@ const Index = () => {
             >
               <Calendar className="w-5 h-5 mr-2" />
               View Dashboard
+            </Button>
+
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              size="lg"
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Logout
             </Button>
           </div>
 

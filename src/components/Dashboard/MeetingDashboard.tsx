@@ -15,6 +15,8 @@ import {
   Zap,
   Star
 } from 'lucide-react';
+import { exportMeetingData } from '@/utils/exportUtils';
+import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 
@@ -39,11 +41,28 @@ interface DashboardStats {
 }
 
 export const MeetingDashboard: React.FC = () => {
+  const { toast } = useToast();
+
+  const handleExport = async (meetingId: string) => {
+    try {
+      await exportMeetingData(meetingId);
+      toast({
+        title: "Export Successful",
+        description: "Meeting data has been downloaded to your desktop"
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export meeting data",
+        variant: "destructive"
+      });
+    }
+  };
   const [stats] = useState<DashboardStats>({
-    totalMeetings: 24,
-    totalDuration: '18h 42m',
-    actionItemsCompleted: 32,
-    totalActionItems: 45,
+    totalMeetings: 1,
+    totalDuration: '1h 23m',
+    actionItemsCompleted: 6,
+    totalActionItems: 8,
     transcriptionAccuracy: 94
   });
 
@@ -111,7 +130,7 @@ export const MeetingDashboard: React.FC = () => {
           </div>
           
           <div className="flex space-x-3">
-            <Button variant="outline" onClick={() => window.location.href = '/meeting-lobby'}>
+            <Button variant="outline" onClick={() => window.location.href = '/schedule-meeting'}>
               <Calendar className="w-4 h-4 mr-2" />
               Schedule Meeting
             </Button>
@@ -249,7 +268,7 @@ export const MeetingDashboard: React.FC = () => {
                             Join
                           </Button>
                         ) : (
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" onClick={() => handleExport(meeting.id)}>
                             <Download className="w-4 h-4 mr-2" />
                             Export
                           </Button>
@@ -304,17 +323,13 @@ export const MeetingDashboard: React.FC = () => {
                   <Video className="w-4 h-4 mr-2" />
                   Start Instant Meeting
                 </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/meeting-lobby'}>
+                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/schedule-meeting'}>
                   <Calendar className="w-4 h-4 mr-2" />
                   Schedule Meeting
                 </Button>
                 <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/meeting-lobby'}>
                   <Users className="w-4 h-4 mr-2" />
                   Join Meeting
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <FileText className="w-4 h-4 mr-2" />
-                  View Transcripts
                 </Button>
               </div>
             </Card>
