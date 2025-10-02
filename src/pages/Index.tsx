@@ -17,7 +17,8 @@ import {
   Play,
   Calendar,
   Settings,
-  LogOut
+  LogOut,
+  ArrowLeft
 } from 'lucide-react';
 
 const Index = () => {
@@ -59,7 +60,16 @@ const Index = () => {
   if (showWelcome) {
     return (
       <div className="min-h-screen bg-gradient-bg flex items-center justify-center p-6">
-        <Card className="max-w-4xl w-full p-8 bg-gradient-card border border-border/50 shadow-ai">
+        <div className="max-w-4xl w-full">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Card className="w-full p-8 bg-gradient-card border border-border/50 shadow-ai">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-primary mb-6 shadow-glow-primary">
               <Brain className="w-10 h-10 text-white" />
@@ -164,6 +174,7 @@ const Index = () => {
             </div>
           </div>
         </Card>
+        </div>
       </div>
     );
   }
