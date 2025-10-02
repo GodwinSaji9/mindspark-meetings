@@ -60,13 +60,26 @@ export const Auth: React.FC = () => {
   }, [navigate, isResetPassword]);
 
   const handleSignUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`
+        emailRedirectTo: `${window.location.origin}/`,
+        data: {
+          email_confirmed: true
+        }
       }
     });
+    
+    // If signup successful, automatically sign in
+    if (!error && data.user) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      return { error: signInError };
+    }
+    
     return { error };
   };
 
