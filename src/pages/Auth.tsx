@@ -71,8 +71,23 @@ export const Auth: React.FC = () => {
       }
     });
     
-    // If signup successful, automatically sign in
-    if (!error && data.user) {
+    // If there's an error, return it
+    if (error) {
+      return { error };
+    }
+    
+    // If user was created (not a repeated signup), auto sign-in
+    if (data.user && !data.user.identities?.length) {
+      // User already exists, show different message
+      return { 
+        error: { 
+          message: 'An account with this email already exists. Please sign in instead.' 
+        } as any 
+      };
+    }
+    
+    // New user created, automatically sign in
+    if (data.user) {
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
